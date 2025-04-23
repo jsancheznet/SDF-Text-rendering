@@ -1,0 +1,8 @@
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/SDL3-shared.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/SDL3_test.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/SDL_uclibc.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/uninstall.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/PACKAGE.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/INSTALL.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/ALL_BUILD.dir
+W:/Projects/Something/libraries/SDL3-3.2.10/build/CMakeFiles/ZERO_CHECK.dir

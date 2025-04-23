@@ -1,0 +1,10 @@
+^W:\PROJECTS\SOMETHING\LIBRARIES\SDL3-3.2.10\BUILD\CMAKEFILES\B8EA71421068ABBC7A8EEF9E52857746\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SW:/Projects/Something/libraries/SDL3-3.2.10 -BW:/Projects/Something/libraries/SDL3-3.2.10/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file W:/Projects/Something/libraries/SDL3-3.2.10/build/SDL3.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
