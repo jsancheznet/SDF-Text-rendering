@@ -1,6 +1,7 @@
 -/libraries
+-*.exe
 
 
 ! compile build.bat
 
-:project-name something
+:project-name TextRender

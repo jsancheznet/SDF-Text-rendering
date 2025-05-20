@@ -2,25 +2,20 @@
 
 pushd build
 
-REM make Shift-f5 run the game!
-
-REM TODO LSP NEXT
-REM TODO GO TO DEFINITION
-REM TODO GO TO DECLARATION
-REM FIND ALL USAGES/REFERENCES
-REM BUILD WITH ONE KEY
-REM OPEN RADDBG WITH ONE KEY AND RUN IT?
-REM TODO COPY ASSETS TO BUILD DIRECTORY
-REM Make it so we can call build.bat from any directory inside the project! (Maybe use projectile?)
-REM PUSHD, POPD always start at base directory
-
 set SDLInclude=-I"..\libraries\SDL3-3.2.10\include"
-set GladInclude=-I"..\libraries\glad\include"
+set GLADInclude=-I"..\libraries\glad\include"
+set GLMInclude=-I"..\libraries\glm-1.0.1-light"
+set STBInclude=-I"..\libraries\stb"
+set JSONInclude=-I"..\libraries\json"
 
-set IncludeDirectories= %SDLInclude% %GladInclude%
+set IncludeDirectories= %SDLInclude% %GLADInclude% %GLMInclude% %STBInclude% %JSONInclude%
 
-REM Build glad
-REM clang-cl ..\libraries\glad\src\glad.c %GladInclude%
-clang-cl ..\src\main.cpp ..\libraries\glad\src\glad.c %IncludeDirectories% /link /LIBPATH:"W:\Projects\Something\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:WINDOWS SDL3.lib
+IF NOT EXIST "assets" MKDIR "assets"
+COPY /Y "..\assets\*.*" "assets\"
+
+IF NOT EXIST "shaders" MKDIR "shaders"
+COPY /Y "..\shaders\*.*" "shaders\"
+
+clang-cl ..\src\main.cpp ..\src\font_data.cpp ..\src\renderer.cpp ..\libraries\glad\src\glad.c %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
 popd
