@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <string>
 #include <map>
@@ -31,13 +31,14 @@ struct kerning_info
     f32 Advance;
 };
 
-struct font_data
+struct bitmap_font
 {
+    u32 TextureHandle;
     std::string ImagePath;
-    
+
     // Atlas data
     std::string Type;
-    std::string YOrigin;    
+    std::string YOrigin;
     i32 TextureWidth;
     i32 TextureHeight;
     i32 DistanceRange;
@@ -65,5 +66,3 @@ struct font_data
     // Kerning Data
     std::vector<kerning_info> KerningInfo;
 };
-
-font_data LoadFontData(std::string FontJson, std::string ImagePath);

@@ -2,16 +2,19 @@
 
 #include <cstdio>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
+#include <json.hpp>
+using json = nlohmann::json;
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Renderer::Renderer(SDL_Window* Window) : Window(Window)
-{
-}
+Renderer::Renderer(SDL_Window* Window) : Window(Window) {}
 
 void Renderer::Init()
 {
@@ -31,14 +34,18 @@ void Renderer::Init()
         glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
 
         // Print all extensions
+#if 0
         for (GLint i = 0; i < numExtensions; i++) {
             const char* extensionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
             std::cout << "Extension #" << i << ": " << extensionName << std::endl;
         }
+#endif
     }
 
     ExampleShader = CompileShader("shaders/hello.glsl");
     ExampleTexture = CreateTexture("assets/Arial.png");
+
+    Roboto = LoadFont("assets/Roboto.json", "assets/Roboto.png");
 
     f32 Vertices[] =
     {
@@ -115,7 +122,6 @@ u32 Renderer::CompileShader(const char* Filename)
         VertexShader = 0;
     }
 
-
     u32 FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     const char *FragmentSource[2] = {"#version 460 core\n#define FRAGMENT_SHADER\n", FileString};
     glShaderSource(FragmentShader, 2, FragmentSource, NULL);
@@ -180,17 +186,94 @@ u32 Renderer::CreateTexture(const char* Filepath)
     return Handle;
 }
 
+bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
+{
+    bitmap_font Result = {};
+
+    Result.ImagePath = Image;
+    Result.TextureHandle = CreateTexture(Image.c_str());
+
+    std::ifstream FileStream(Json);
+    std::ostringstream Buffer;
+    Buffer << FileStream.rdbuf();
+    std::string JsonString = Buffer.str().c_str();
+
+    json JsonObject = json::parse(JsonString);
+
+    // Atlas
+    Result.Type = JsonObject["atlas"]["type"].get<std::string>();
+    Result.TextureWidth = JsonObject["atlas"]["width"].get<i32>();
+    Result.TextureHeight = JsonObject["atlas"]["height"].get<i32>();
+    Result.DistanceRange = JsonObject["atlas"]["distanceRange"].get<i32>();
+    Result.DistanceRangeMiddle = JsonObject["atlas"]["distanceRangeMiddle"].get<i32>();
+    Result.Size = JsonObject["atlas"]["size"].get<f32>();
+    Result.YOrigin = JsonObject["atlas"]["yOrigin"].get<std::string>();
+
+    // Grid
+    if(JsonObject.contains("grid"))
+    {
+        Result.GridCellWidth = JsonObject["atlas"]["grid"]["cellWidth"].get<i32>();
+        Result.GridCellHeight = JsonObject["atlas"]["grid"]["cellHeight"].get<i32>();
+        Result.GridColumns = JsonObject["atlas"]["grid"]["columns"].get<i32>();
+        Result.GridRows = JsonObject["atlas"]["grid"]["rows"].get<i32>();
+        Result.GridOriginY = JsonObject["atlas"]["grid"]["originY"].get<f32>();
+    }
+
+    // Metrics
+    Result.MetricsEmSize = JsonObject["metrics"]["emSize"].get<i32>();
+    Result.MetricsLineHeight = JsonObject["metrics"]["lineHeight"].get<f32>();
+    Result.MetricsAscender = JsonObject["metrics"]["ascender"].get<f32>();
+    Result.MetricsDescender = JsonObject["metrics"]["descender"].get<f32>();
+    Result.MetricsUnderlineY= JsonObject["metrics"]["underlineY"].get<f32>();
+    Result.MetricsThickness = JsonObject["metrics"]["underlineThickness"].get<f32>();
+
+    // Glyphs
+    i32 GlyphCount = JsonObject["glyphs"].size();
+    for(int  i = 0; i < GlyphCount; ++i)
+    {
+        glyph Glyph = {};
+
+        Glyph.UnicodeId = JsonObject["glyphs"][i]["unicode"].get<i32>();
+        Glyph.Advance = JsonObject["glyphs"][i]["advance"].get<f32>();
+
+        if(JsonObject["glyphs"][i].contains("planeBounds"))
+        {
+            Glyph.PlaneBoundsLeft = JsonObject["glyphs"][i]["planeBounds"]["left"].get<f32>();
+            Glyph.PlaneBoundsBottom = JsonObject["glyphs"][i]["planeBounds"]["bottom"].get<f32>();
+            Glyph.PlaneBoundsRight = JsonObject["glyphs"][i]["planeBounds"]["right"].get<f32>();
+            Glyph.PlaneBoundsTop = JsonObject["glyphs"][i]["planeBounds"]["top"].get<f32>();
+        }
+
+        if(JsonObject["glyphs"][i].contains("atlasBounds"))
+        {
+            Glyph.AtlasBoundsLeft = JsonObject["glyphs"][i]["atlasBounds"]["left"].get<f32>();
+            Glyph.AtlasBoundsBottom = JsonObject["glyphs"][i]["atlasBounds"]["bottom"].get<f32>();
+            Glyph.AtlasBoundsRight = JsonObject["glyphs"][i]["atlasBounds"]["right"].get<f32>();
+            Glyph.AtlasBoundsTop = JsonObject["glyphs"][i]["atlasBounds"]["top"].get<f32>();
+        }
+
+        Result.Glyphs[Glyph.UnicodeId] = Glyph;
+    }
+
+    i32 KerningCount = JsonObject["kerning"].size();
+    if(KerningCount > 0)
+    {
+        for(i32 i = 0; i < KerningCount; ++i)
+        {
+            kerning_info KerningInfo = {};
+
+            KerningInfo.Unicode1 = JsonObject["kerning"][i]["unicode1"].get<i32>();
+            KerningInfo.Unicode2 = JsonObject["kerning"][i]["unicode2"].get<i32>();
+            KerningInfo.Advance = JsonObject["kerning"][i]["advance"].get<f32>();
+        }
+    }
+
+    return Result;
+}
+
 void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
 {
     using namespace std;
-
-    Source;
-    Type;
-    Id;
-    Severity;
-    Length;
-    Message;
-    UserParam;
 
     switch (Source)
     {

@@ -4,11 +4,12 @@
 #include <glad/glad.h>
 
 #include "SDL3/SDL_video.h"
+#include "bitmap_font.h"
 
-class Renderer
+struct Renderer
 {
 
-public:
+    Renderer(SDL_Window *Window);
 
     u32 VAO = 0;
     u32 VBO = 0;
@@ -17,15 +18,16 @@ public:
     u32 ExampleShader = 0;
     u32 ExampleTexture = 0;
 
-    Renderer(SDL_Window *Window);
-
     void Init();
-
     void BeginFrame();
     void EndFrame();
-
     u32 CompileShader(const char* Filename);
     u32 CreateTexture(const char* Filepath);
+
+    // Font And Text Drawing
+    bitmap_font Roboto;
+
+    bitmap_font LoadFont(std::string Json, std::string Image);
 
     // TODO(Jsanchez): DrawSprite(Sprite), on this function just maintain a batch renderer!, we can use the opengl bible
     // https://jasonliang.js.org/batch-renderer.html, this looks like a good read

@@ -8,12 +8,9 @@
 
 #include "renderer.h"
 #include "typedefs.h"
-#include "font_data.h"
 
-// T̶O̶D̶O̶:̶ ̶M̶e̶t̶e̶r̶ ̶l̶a̶s̶ ̶t̶o̶o̶l̶s̶ ̶d̶e̶n̶t̶r̶o̶ ̶d̶e̶ ̶u̶n̶a̶ ̶c̶a̶r̶p̶e̶t̶a̶ ̶"̶t̶o̶o̶l̶s̶"̶,̶ ̶m̶e̶t̶e̶r̶ ̶a̶c̶a̶ ̶e̶l̶ ̶c̶o̶s̶o̶ ̶q̶u̶e̶ ̶g̶e̶n̶e̶r̶a̶ ̶b̶i̶t̶m̶a̶p̶f̶o̶n̶t̶s̶ ̶s̶d̶f̶
+// TODO(Jsanchez): Draw the A we are currently drawing but using the data from the loaded font!
 
-// - When you don't know, just try something!
-// - Hacer Renderer->LoadFont("Json", "Img"); // Usando la data que vaya precisando, en este momento para dibujar solo la A preciso glyph con texture coordinates
 // - Dibujar una letra asi como la tengo hoy, pero desde el renderer consumiendo el json
 // - Anotar bien para que sirve cada dato de la font data, se que los atlas bounds son los bounds de la letra en la imagen, en pixeles!
 // - Dibujar solo 1 character, sin pensar en batching, _usando el json de la font_
@@ -21,28 +18,6 @@
 // - Hacer que se dibuje bien utilizando SDF
 // - Dibujar un string sin pensar en batching
 // - Batchear ese string!!
-
-// TODO: Leer un poco sobre sprite rendering
-// TODO: Leer un poco sobre batch rendering
-// TODO: Window size should not modify aspect ratio
-// TODO: Research RK Integrator and do i need one of those? or something similar? Verlet Integration? Which one is Casey's?
-// TODO: Integrar IMGUI
-
-// BIG TASKS
-//    - RK Integration?
-//        - Reread and research what this means and how to do it
-//    - Fast Text Rendering
-//        - I can do this using a spritefont sheet!, it can be the same implementation as a spritesheet and kill two birds with one stone
-//        - Research how this is done! Find something i can implement
-//    - Spritesheet Animation
-//         - Research
-
-// RIDER TODO
-// - Mejorar el estado de los includes, incluye cualquier cosa y no es bueno
-// - A veces el autocomplete molesta mas que ayuda
-
-// NOTES
-//     - Quadtree might be a good algorithm for partioning my world!
 
 b32 IsRunning = true;
 
@@ -130,8 +105,6 @@ int main(i32 Argc, char** Argv)
     glm::vec3 CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::mat4 View = glm::lookAt(CameraPosition, CameraTarget, CameraUp);
     glm::mat4 Projection = glm::ortho(-240.0f, 240.0f, -135.0f, 135.0f, 0.1f, 100.0f);
-
-    font_data Roboto = LoadFontData("assets/Arial.json", "assets/Arial.png");
 
     while (IsRunning)
     {

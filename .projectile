@@ -1,6 +1,9 @@
 -/libraries
 -*.exe
-
+-*.obj
+-*.ilk
+-*.rdi
+-*.dll
 
 ! compile build.bat
 

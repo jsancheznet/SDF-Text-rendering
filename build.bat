@@ -1,3 +1,4 @@
+
 @echo off
 
 pushd build
@@ -16,6 +17,6 @@ COPY /Y "..\assets\*.*" "assets\"
 IF NOT EXIST "shaders" MKDIR "shaders"
 COPY /Y "..\shaders\*.*" "shaders\"
 
-clang-cl ..\src\main.cpp ..\src\font_data.cpp ..\src\renderer.cpp ..\libraries\glad\src\glad.c %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
+clang-cl /Zi ..\src\main.cpp ..\src\renderer.cpp ..\libraries\glad\src\glad.c %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
 popd
