@@ -16,7 +16,6 @@ struct Renderer
     u32 EBO = 0;
 
     u32 ExampleShader = 0;
-    u32 ExampleTexture = 0;
 
     void Init();
     void BeginFrame();
@@ -25,9 +24,11 @@ struct Renderer
     u32 CreateTexture(const char* Filepath);
 
     // Font And Text Drawing
-    bitmap_font Roboto;
+    bitmap_font DefaultFont;
 
     bitmap_font LoadFont(std::string Json, std::string Image);
+
+    void RenderText(std::string Text);
 
     // TODO(Jsanchez): DrawSprite(Sprite), on this function just maintain a batch renderer!, we can use the opengl bible
     // https://jasonliang.js.org/batch-renderer.html, this looks like a good read

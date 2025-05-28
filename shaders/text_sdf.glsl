@@ -26,7 +26,11 @@ uniform sampler2D Texture;
 
 void main()
 {
-    FragmentColor = vec4(texture(Texture, TexCoord));
+    vec4 TextureColor = vec4(texture(Texture, TexCoord));
+
+    TextureColor.a *= step(0.001, TextureColor.r); // if .r <= 0.001, set alpha to 0, else to 1.0
+
+    FragmentColor = TextureColor;
 }
 
 #endif

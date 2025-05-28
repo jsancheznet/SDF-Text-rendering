@@ -9,11 +9,11 @@
 #include "renderer.h"
 #include "typedefs.h"
 
-// TODO(Jsanchez): Draw the A we are currently drawing but using the data from the loaded font!
+// ̶-̶ ̶D̶i̶b̶u̶j̶a̶r̶ ̶s̶o̶l̶o̶ ̶1̶ ̶c̶h̶a̶r̶a̶c̶t̶e̶r̶,̶ ̶s̶i̶n̶ ̶p̶e̶n̶s̶a̶r̶ ̶e̶n̶ ̶b̶a̶t̶c̶h̶i̶n̶g̶,̶ ̶_̶u̶s̶a̶n̶d̶o̶ ̶e̶l̶ ̶j̶s̶o̶n̶ ̶d̶e̶ ̶l̶a̶ ̶f̶o̶n̶t̶_̶,̶ ̶c̶r̶e̶a̶r̶ ̶u̶n̶a̶ ̶f̶u̶n̶c̶i̶o̶n̶ ̶q̶u̶e̶ ̶d̶i̶b̶u̶j̶e̶ ̶u̶n̶ ̶c̶h̶a̶r̶a̶c̶t̶e̶r̶
 
-// - Dibujar una letra asi como la tengo hoy, pero desde el renderer consumiendo el json
+// - Implementar zoom tanto para proyecciones ortograficas y perspectivas asi puedo acercarme y ver el resultado de el sdf rendering!
+
 // - Anotar bien para que sirve cada dato de la font data, se que los atlas bounds son los bounds de la letra en la imagen, en pixeles!
-// - Dibujar solo 1 character, sin pensar en batching, _usando el json de la font_
 // - Al procesar la fuente para el renderer hacer todos los calculos una vez sola, ejemplo: Pasar los atlas bounds de pixels a 0..1, y otros calculos mas que se puedan, si no hay que hacerlos cada frame!
 // - Hacer que se dibuje bien utilizando SDF
 // - Dibujar un string sin pensar en batching
@@ -112,6 +112,8 @@ int main(i32 Argc, char** Argv)
 
         Render->BeginFrame();
 
+        // TODO(Jsanchez): Renderer->UpdateCameraUniforms
+
         // Upload Camera Settings
         i32 ViewLocation = glGetUniformLocation(Render->ExampleShader, "View");
         i32 ProjectionLocation = glGetUniformLocation(Render->ExampleShader, "Projection");
@@ -127,8 +129,7 @@ int main(i32 Argc, char** Argv)
         i32 ModelLocation = glGetUniformLocation(Render->ExampleShader, "Model");
         glUniformMatrix4fv(ModelLocation, 1, GL_FALSE, glm::value_ptr(Model));
 
-        // Draw the quad
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        Render->RenderText("as");
 
         Render->EndFrame();
     }

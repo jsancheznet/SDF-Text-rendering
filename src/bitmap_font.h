@@ -12,16 +12,16 @@ struct glyph
     f32 Advance;
 
     // Plane Bounds
-    f32 PlaneBoundsLeft;
-    f32 PlaneBoundsBottom;
-    f32 PlaneBoundsRight;
-    f32 PlaneBoundsTop;
+    f32 PlaneLeft;
+    f32 PlaneBottom;
+    f32 PlaneRight;
+    f32 PlaneTop;
 
-    // Atlas Bounds
-    f32 AtlasBoundsLeft;
-    f32 AtlasBoundsBottom;
-    f32 AtlasBoundsRight;
-    f32 AtlasBoundsTop;
+    // UV's
+    f32 Left;
+    f32 Right;
+    f32 Bottom;
+    f32 Top;
 };
 
 struct kerning_info
@@ -33,7 +33,7 @@ struct kerning_info
 
 struct bitmap_font
 {
-    u32 TextureHandle;
+    u32 Texture;
     std::string ImagePath;
 
     // Atlas data

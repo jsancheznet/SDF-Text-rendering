@@ -4,6 +4,7 @@
 -*.ilk
 -*.rdi
 -*.dll
+-*.pdb
 
 ! compile build.bat
 

@@ -33,28 +33,40 @@ void Renderer::Init()
         GLint numExtensions;
         glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
 
-        // Print all extensions
+        // Print all extensions to stdout
 #if 0
         for (GLint i = 0; i < numExtensions; i++) {
             const char* extensionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
             std::cout << "Extension #" << i << ": " << extensionName << std::endl;
         }
 #endif
+
     }
 
-    ExampleShader = CompileShader("shaders/hello.glsl");
-    ExampleTexture = CreateTexture("assets/Arial.png");
+    ExampleShader = CompileShader("shaders/text_sdf.glsl");
 
-    Roboto = LoadFont("assets/Roboto.json", "assets/Roboto.png");
+    DefaultFont = LoadFont("assets/Roboto.json", "assets/Roboto.png");
+
+    // glyph MyGlyph = Roboto.Glyphs['A'];
+
+    // f32 Vertices[] =
+    // {
+    //     // Positions        // Texture Coordinates
+    //     0.5f, 0.5f, 0.0f, MyGlyph.Right, MyGlyph.Top, // top right
+    //     0.5f, -0.5f, 0.0f, MyGlyph.Right, MyGlyph.Bottom, // bottom right
+    //     -0.5f, -0.5f, 0.0f, MyGlyph.Left, MyGlyph.Bottom, // bottom left
+    //     -0.5f, 0.5f, 0.0f, MyGlyph.Left, MyGlyph.Top // top left
+    // };
 
     f32 Vertices[] =
     {
         // Positions        // Texture Coordinates
-        0.5f, 0.5f, 0.0f, 0.5200, 0.3370f, // top right
-        0.5f, -0.5f, 0.0f, 0.5200f, 0.2120f, // bottom right
-        -0.5f, -0.5f, 0.0f, 0.4040f, 0.2120f, // bottom left
-        -0.5f, 0.5f, 0.0f, 0.4040f, 0.3370f // top left
+        0.5f, 0.5f, 0.0f,   0.0f, 0.0f,   // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,   // bottom left
+        -0.5f, 0.5f, 0.0f,  0.0f, 0.0f    // top left
     };
+
 
     u32 Indices[] =
     {
@@ -65,7 +77,7 @@ void Renderer::Init()
     glCreateVertexArrays(1,&VAO);
 
     glCreateBuffers(1,  &VBO);
-    glNamedBufferStorage(VBO, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(VBO, sizeof(Vertices), NULL, GL_DYNAMIC_STORAGE_BIT); // Only allocate memory, do not set it
 
     glCreateBuffers(1, &EBO);
     glNamedBufferStorage(EBO, sizeof(Indices), Indices, GL_DYNAMIC_STORAGE_BIT);
@@ -82,7 +94,7 @@ void Renderer::Init()
     glVertexArrayAttribBinding(VAO, 0, 0); // I don't understand the last parameter, WTF? Why always 0?
     glVertexArrayAttribBinding(VAO, 1, 0);
 
-    glBindTextureUnit(0, ExampleTexture);
+    glBindTextureUnit(0, DefaultFont.Texture);
 }
 
 void Renderer::BeginFrame()
@@ -191,7 +203,7 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
     bitmap_font Result = {};
 
     Result.ImagePath = Image;
-    Result.TextureHandle = CreateTexture(Image.c_str());
+    Result.Texture = CreateTexture(Image.c_str());
 
     std::ifstream FileStream(Json);
     std::ostringstream Buffer;
@@ -238,18 +250,18 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
 
         if(JsonObject["glyphs"][i].contains("planeBounds"))
         {
-            Glyph.PlaneBoundsLeft = JsonObject["glyphs"][i]["planeBounds"]["left"].get<f32>();
-            Glyph.PlaneBoundsBottom = JsonObject["glyphs"][i]["planeBounds"]["bottom"].get<f32>();
-            Glyph.PlaneBoundsRight = JsonObject["glyphs"][i]["planeBounds"]["right"].get<f32>();
-            Glyph.PlaneBoundsTop = JsonObject["glyphs"][i]["planeBounds"]["top"].get<f32>();
+            Glyph.PlaneLeft = JsonObject["glyphs"][i]["planeBounds"]["left"].get<f32>();
+            Glyph.PlaneBottom = JsonObject["glyphs"][i]["planeBounds"]["bottom"].get<f32>();
+            Glyph.PlaneRight = JsonObject["glyphs"][i]["planeBounds"]["right"].get<f32>();
+            Glyph.PlaneTop = JsonObject["glyphs"][i]["planeBounds"]["top"].get<f32>();
         }
 
         if(JsonObject["glyphs"][i].contains("atlasBounds"))
         {
-            Glyph.AtlasBoundsLeft = JsonObject["glyphs"][i]["atlasBounds"]["left"].get<f32>();
-            Glyph.AtlasBoundsBottom = JsonObject["glyphs"][i]["atlasBounds"]["bottom"].get<f32>();
-            Glyph.AtlasBoundsRight = JsonObject["glyphs"][i]["atlasBounds"]["right"].get<f32>();
-            Glyph.AtlasBoundsTop = JsonObject["glyphs"][i]["atlasBounds"]["top"].get<f32>();
+            Glyph.Left = JsonObject["glyphs"][i]["atlasBounds"]["left"].get<f32>() / Result.TextureWidth;
+            Glyph.Right = JsonObject["glyphs"][i]["atlasBounds"]["right"].get<f32>() / Result.TextureWidth;
+            Glyph.Bottom = JsonObject["glyphs"][i]["atlasBounds"]["bottom"].get<f32>() / Result.TextureHeight;
+            Glyph.Top = JsonObject["glyphs"][i]["atlasBounds"]["top"].get<f32>() / Result.TextureHeight;
         }
 
         Result.Glyphs[Glyph.UnicodeId] = Glyph;
@@ -269,6 +281,24 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
     }
 
     return Result;
+}
+
+void Renderer::RenderText(std::string Text)
+{
+    glyph Glyph = DefaultFont.Glyphs[Text[0]];
+
+    f32 Vertices[] =
+    {
+        // Positions        // Texture Coordinates
+        0.5f, 0.5f, 0.0f, Glyph.Right, Glyph.Top, // top right
+        0.5f, -0.5f, 0.0f, Glyph.Right, Glyph.Bottom, // bottom right
+        -0.5f, -0.5f, 0.0f, Glyph.Left, Glyph.Bottom, // bottom left
+        -0.5f, 0.5f, 0.0f, Glyph.Left, Glyph.Top // top left
+    };
+
+    glNamedBufferSubData(VBO, 0, sizeof(Vertices), Vertices);
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
