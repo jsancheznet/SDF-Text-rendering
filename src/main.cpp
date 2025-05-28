@@ -9,7 +9,7 @@
 #include "renderer.h"
 #include "typedefs.h"
 
-// ̶-̶ ̶D̶i̶b̶u̶j̶a̶r̶ ̶s̶o̶l̶o̶ ̶1̶ ̶c̶h̶a̶r̶a̶c̶t̶e̶r̶,̶ ̶s̶i̶n̶ ̶p̶e̶n̶s̶a̶r̶ ̶e̶n̶ ̶b̶a̶t̶c̶h̶i̶n̶g̶,̶ ̶_̶u̶s̶a̶n̶d̶o̶ ̶e̶l̶ ̶j̶s̶o̶n̶ ̶d̶e̶ ̶l̶a̶ ̶f̶o̶n̶t̶_̶,̶ ̶c̶r̶e̶a̶r̶ ̶u̶n̶a̶ ̶f̶u̶n̶c̶i̶o̶n̶ ̶q̶u̶e̶ ̶d̶i̶b̶u̶j̶e̶ ̶u̶n̶ ̶c̶h̶a̶r̶a̶c̶t̶e̶r̶
+// - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 characteres asi podemos probar que pasa cuando se rompe, seguir leyendo en DrawText
 
 // - Implementar zoom tanto para proyecciones ortograficas y perspectivas asi puedo acercarme y ver el resultado de el sdf rendering!
 

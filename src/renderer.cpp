@@ -285,6 +285,13 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
 
 void Renderer::RenderText(std::string Text)
 {
+    // Idea
+
+    // 1- En Init, reservar memoria para 5 chars en VBO
+    // 2- En esta funcion, crear un buffer para los 5 chars y rellenar los datos
+    // 3- Enviarlo a la gpu usando buffersubdata
+    // 4- Dibujarlo!
+
     glyph Glyph = DefaultFont.Glyphs[Text[0]];
 
     f32 Vertices[] =
