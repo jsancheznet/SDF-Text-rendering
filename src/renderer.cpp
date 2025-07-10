@@ -47,40 +47,17 @@ void Renderer::Init()
 
     DefaultFont = LoadFont("assets/Roboto.json", "assets/Roboto.png");
 
-    // glyph MyGlyph = Roboto.Glyphs['A'];
-
-    // f32 Vertices[] =
-    // {
-    //     // Positions        // Texture Coordinates
-    //     0.5f, 0.5f, 0.0f, MyGlyph.Right, MyGlyph.Top, // top right
-    //     0.5f, -0.5f, 0.0f, MyGlyph.Right, MyGlyph.Bottom, // bottom right
-    //     -0.5f, -0.5f, 0.0f, MyGlyph.Left, MyGlyph.Bottom, // bottom left
-    //     -0.5f, 0.5f, 0.0f, MyGlyph.Left, MyGlyph.Top // top left
-    // };
-
-    f32 Vertices[] =
-    {
-        // Positions        // Texture Coordinates
-        0.5f, 0.5f, 0.0f,   0.0f, 0.0f,   // top right
-        0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,   // bottom left
-        -0.5f, 0.5f, 0.0f,  0.0f, 0.0f    // top left
-    };
-
-
-    u32 Indices[] =
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
-
     glCreateVertexArrays(1,&VAO);
 
-    glCreateBuffers(1,  &VBO);
-    glNamedBufferStorage(VBO, sizeof(Vertices), NULL, GL_DYNAMIC_STORAGE_BIT); // Only allocate memory, do not set it
+    i32 CharacterSize = sizeof(f32) * 20;
+    i32 EboSize = sizeof(u32) * 6;
 
+    glCreateBuffers(1,  &VBO);
+    glNamedBufferStorage(VBO, CharacterSize, NULL, GL_DYNAMIC_STORAGE_BIT); // Only allocate memory, do not set it
+
+    u32 QuadEBOData[6] = {0, 1, 3, 1, 2, 3};
     glCreateBuffers(1, &EBO);
-    glNamedBufferStorage(EBO, sizeof(Indices), Indices, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(EBO, EboSize, &QuadEBOData, GL_DYNAMIC_STORAGE_BIT);
 
     glVertexArrayVertexBuffer(VAO, 0, VBO, 0, sizeof(f32) * 5); // f32 *5 is the stride between each vertex
     glVertexArrayElementBuffer(VAO, EBO);
@@ -184,8 +161,8 @@ u32 Renderer::CreateTexture(const char* Filepath)
 
     glTextureParameteri(Handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(Handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(Handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(Handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(Handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(Handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTextureStorage2D(Handle, 1, GL_RGBA8, Width, Height);
 
@@ -300,7 +277,7 @@ void Renderer::RenderText(std::string Text)
         0.5f, 0.5f, 0.0f, Glyph.Right, Glyph.Top, // top right
         0.5f, -0.5f, 0.0f, Glyph.Right, Glyph.Bottom, // bottom right
         -0.5f, -0.5f, 0.0f, Glyph.Left, Glyph.Bottom, // bottom left
-        -0.5f, 0.5f, 0.0f, Glyph.Left, Glyph.Top // top left
+        -0.5f, 0.5f, 0.0f, Glyph.Left, Glyph.Top, // top left
     };
 
     glNamedBufferSubData(VBO, 0, sizeof(Vertices), Vertices);
@@ -311,6 +288,8 @@ void Renderer::RenderText(std::string Text)
 void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
 {
     using namespace std;
+
+    if(Severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
 
     switch (Source)
     {
@@ -330,7 +309,7 @@ void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id,
         case GL_DEBUG_TYPE_PORTABILITY: cout << "PORTABILITY:"; break;
         case GL_DEBUG_TYPE_PERFORMANCE: cout << "PERFORMANCE:"; break;
         case GL_DEBUG_TYPE_MARKER: cout << "MARKER:"; break;
-        case GL_DEBUG_TYPE_OTHER: cout << "OTHER:"; break;
+        // case GL_DEBUG_TYPE_OTHER: cout << "OTHER:"; break;
     }
 
     switch (Severity)

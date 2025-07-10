@@ -26,11 +26,10 @@ uniform sampler2D Texture;
 
 void main()
 {
-    vec4 TextureColor = vec4(texture(Texture, TexCoord));
-
-    TextureColor.a *= step(0.001, TextureColor.r); // if .r <= 0.001, set alpha to 0, else to 1.0
-
-    FragmentColor = TextureColor;
+    float Smoothing = 0.02;
+    float Distance = texture(Texture, TexCoord).x;
+    float Alpha = smoothstep(0.5 - Smoothing, 0.5 + Smoothing, Distance);
+    FragmentColor = vec4(vec3(1.0), Alpha);
 }
 
 #endif

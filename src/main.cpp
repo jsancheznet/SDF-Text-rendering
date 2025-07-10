@@ -9,10 +9,13 @@
 #include "renderer.h"
 #include "typedefs.h"
 
-// - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 characteres asi podemos probar que pasa cuando se rompe, seguir leyendo en DrawText
+// Para darlo por terminado: Dibujar una string de texto batcheada y usando signed distance fields
 
+// TODO: Leer el pixel shader y entender porque funciona
+// TODO: Hacer que se dibuje la letra A pero usando la data de la bitmap font. En este momento esta hardcodeada
+
+// - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 caracteres
 // - Implementar zoom tanto para proyecciones ortograficas y perspectivas asi puedo acercarme y ver el resultado de el sdf rendering!
-
 // - Anotar bien para que sirve cada dato de la font data, se que los atlas bounds son los bounds de la letra en la imagen, en pixeles!
 // - Al procesar la fuente para el renderer hacer todos los calculos una vez sola, ejemplo: Pasar los atlas bounds de pixels a 0..1, y otros calculos mas que se puedan, si no hay que hacerlos cada frame!
 // - Hacer que se dibuje bien utilizando SDF
@@ -121,7 +124,8 @@ int main(i32 Argc, char** Argv)
         glUniformMatrix4fv(ProjectionLocation, 1, GL_FALSE, glm::value_ptr(Projection));
 
         // Update and set rendering variables to quad!
-        glm::vec3 QuadScale = glm::vec3(80.0f, 80.0, 40.0f);
+        float Scale = 840.0f;
+        glm::vec3 QuadScale = glm::vec3(Scale, Scale, Scale);
         glm::vec3 QuadPosition = {QuadPositionX, 0.0f, 0.0f};
         glm::mat4 Model = glm::mat4(1.0f);
         Model = glm::scale(Model, QuadScale);
