@@ -7,11 +7,13 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "renderer.h"
+#include "camera.h"
 #include "typedefs.h"
 
 // Para darlo por terminado: Dibujar una string de texto batcheada y usando signed distance fields
 
-// TODO: Leer el pixel shader y entender porque funciona
+// TODO: Terminar de leer el capitulo de font rendering del libro, resulta que me falto la parte de texto, no tendria porque haber ido a chatgpt
+// TODO: Leer el pixel shader y entender porque funciona, solamente tengo que entender el smoothstep, es facil
 // TODO: Hacer que se dibuje la letra A pero usando la data de la bitmap font. En este momento esta hardcodeada
 
 // - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 caracteres
@@ -25,6 +27,8 @@
 b32 IsRunning = true;
 
 f32 QuadPositionX = 0.0f;
+
+camera Camera;
 
 void ProcessEvents()
 {
@@ -69,6 +73,12 @@ void ProcessEvents()
                 break;
             }
 
+            case SDL_EVENT_MOUSE_WHEEL:
+            {
+                Camera.ApplyZoom(Event.wheel.y);
+                break;
+            }
+
             default:
             {
                 break;
@@ -95,7 +105,7 @@ int main(i32 Argc, char** Argv)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
     // TODO: Platform->CreateWindow("Untitled", 1366, 768);
-    SDL_Window* Window = SDL_CreateWindow("Untitled", 1366, 768, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+    SDL_Window* Window = SDL_CreateWindow("SDF Text Rendering", 1366, 768, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     SDL_GLContext GLContext = SDL_GL_CreateContext(Window);
 
     Renderer* Render = new Renderer(Window);
@@ -103,11 +113,17 @@ int main(i32 Argc, char** Argv)
 
     // Camera Configuration
     // TODO: What type of projection is better for 2D?
-    glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::mat4 View = glm::lookAt(CameraPosition, CameraTarget, CameraUp);
-    glm::mat4 Projection = glm::ortho(-240.0f, 240.0f, -135.0f, 135.0f, 0.1f, 100.0f);
+    Camera.Position = glm::vec3(0.0f, 0.0f, 3.0f);
+    Camera.Target = glm::vec3(0.0f, 0.0f, 0.0f);
+    Camera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
+    Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
+
+    Camera.Width = 240.0f;
+    Camera.Height = 135.0f;
+    Camera.Near = 0.1f;
+    Camera.Far = 100.0f;
+
+    Camera.Projection = glm::ortho(-Camera.Width, Camera.Width, -Camera.Height, Camera.Height, Camera.Near, Camera.Far);
 
     while (IsRunning)
     {
@@ -116,15 +132,14 @@ int main(i32 Argc, char** Argv)
         Render->BeginFrame();
 
         // TODO(Jsanchez): Renderer->UpdateCameraUniforms
-
         // Upload Camera Settings
         i32 ViewLocation = glGetUniformLocation(Render->ExampleShader, "View");
         i32 ProjectionLocation = glGetUniformLocation(Render->ExampleShader, "Projection");
-        glUniformMatrix4fv(ViewLocation, 1, GL_FALSE, glm::value_ptr(View));
-        glUniformMatrix4fv(ProjectionLocation, 1, GL_FALSE, glm::value_ptr(Projection));
+        glUniformMatrix4fv(ViewLocation, 1, GL_FALSE, glm::value_ptr(Camera.View));
+        glUniformMatrix4fv(ProjectionLocation, 1, GL_FALSE, glm::value_ptr(Camera.Projection));
 
         // Update and set rendering variables to quad!
-        float Scale = 840.0f;
+        float Scale = 40.0f;
         glm::vec3 QuadScale = glm::vec3(Scale, Scale, Scale);
         glm::vec3 QuadPosition = {QuadPositionX, 0.0f, 0.0f};
         glm::mat4 Model = glm::mat4(1.0f);

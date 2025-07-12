@@ -269,7 +269,7 @@ void Renderer::RenderText(std::string Text)
     // 3- Enviarlo a la gpu usando buffersubdata
     // 4- Dibujarlo!
 
-    glyph Glyph = DefaultFont.Glyphs[Text[0]];
+    glyph Glyph = DefaultFont.Glyphs[Text[1]];
 
     f32 Vertices[] =
     {
