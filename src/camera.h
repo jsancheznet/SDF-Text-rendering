@@ -18,7 +18,6 @@ struct camera
     f32 Height;
     f32 Near;
     f32 Far;
-    f32 Zoom = 1.0f;
 
     void ApplyZoom(f32 Input);
 };
