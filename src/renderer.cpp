@@ -263,14 +263,6 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
 
 void Renderer::RenderText(std::string Text)
 {
-    // Idea
-
-    // 1- En Init, reservar memoria para 5 chars en VBO
-    // 2- En esta funcion, crear un buffer para los 5 chars y rellenar los datos
-    // 3- Enviarlo a la gpu usando buffersubdata
-    // 4- Dibujarlo!
-
-    // TODO(Jsanchez): loop over the string, and draw the text adding +1.0f on horizontal position to every
 
     f32 Advance = 0.0f;
     for(i32 Index = 0; Index < Text.length(); Index++)

@@ -10,21 +10,12 @@
 #include "camera.h"
 #include "typedefs.h"
 
-// Para darlo por terminado: Dibujar una string de texto batcheada y usando signed distance fields
-
-// TODO: Leer el pixel shader y entender porque funciona, solamente tengo que entender el smoothstep, es facil
-// TODO: Terminar de leer el capitulo de font rendering del libro, resulta que me falto la parte de texto, no tendria porque haber ido a chatgpt
-// TODO: Leer capitulo SDF en realtime rendering
-// TODO: Hacer que se dibuje la letra A pero usando la data de la bitmap font. En este momento esta hardcodeada
-
-// - Creo que no se esta dibujando bien, estamos usando un cuadrado que estira de manera que no deberia las letras, capas que deberiamos generar el "rectangulo" que contiene la letra segun el json
-// - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 caracteres
-// - Anotar bien para que sirve cada dato de la font data, se que los atlas bounds son los bounds de la letra en la imagen, en pixeles!
-
-// - Al procesar la fuente para el renderer hacer todos los calculos una vez sola, ejemplo: Pasar los atlas bounds de pixels a 0..1, y otros calculos mas que se puedan, si no hay que hacerlos cada frame!
-// - Hacer que se dibuje bien utilizando SDF
-// - Dibujar un string sin pensar en batching
-// - Batchear ese string!!
+// TODO LIST:
+//     - Boton mouse izquierda apretado mueve la camara en el plano XY
+//     - Hacer que el texto pequenio se vea mejor
+//     - Batchear los caracteres en solo una draw call
+//     - UBO for Camera
+//     - Hacer un refactor quitando la variable QuadPositionX de globales
 
 b32 IsRunning = true;
 
@@ -79,6 +70,16 @@ void ProcessEvents()
             {
                 Camera.ApplyZoom(Event.wheel.y);
                 break;
+            }
+
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            {
+                printf("Down\n");
+            }
+
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+            {
+                printf("Up\n");
             }
 
             default:
