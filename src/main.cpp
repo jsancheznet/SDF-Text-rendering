@@ -12,13 +12,15 @@
 
 // Para darlo por terminado: Dibujar una string de texto batcheada y usando signed distance fields
 
-// TODO: Terminar de leer el capitulo de font rendering del libro, resulta que me falto la parte de texto, no tendria porque haber ido a chatgpt
 // TODO: Leer el pixel shader y entender porque funciona, solamente tengo que entender el smoothstep, es facil
+// TODO: Terminar de leer el capitulo de font rendering del libro, resulta que me falto la parte de texto, no tendria porque haber ido a chatgpt
+// TODO: Leer capitulo SDF en realtime rendering
 // TODO: Hacer que se dibuje la letra A pero usando la data de la bitmap font. En este momento esta hardcodeada
 
+// - Creo que no se esta dibujando bien, estamos usando un cuadrado que estira de manera que no deberia las letras, capas que deberiamos generar el "rectangulo" que contiene la letra segun el json
 // - Podemos probar hacer malloc de un buffer de texto bien grande, que entre al menos 5 caracteres
-// - Implementar zoom tanto para proyecciones ortograficas y perspectivas asi puedo acercarme y ver el resultado de el sdf rendering!
 // - Anotar bien para que sirve cada dato de la font data, se que los atlas bounds son los bounds de la letra en la imagen, en pixeles!
+
 // - Al procesar la fuente para el renderer hacer todos los calculos una vez sola, ejemplo: Pasar los atlas bounds de pixels a 0..1, y otros calculos mas que se puedan, si no hay que hacerlos cada frame!
 // - Hacer que se dibuje bien utilizando SDF
 // - Dibujar un string sin pensar en batching
@@ -26,7 +28,7 @@
 
 b32 IsRunning = true;
 
-f32 QuadPositionX = 0.0f;
+f32 QuadPositionX = -2.0f;
 
 camera Camera;
 
@@ -122,7 +124,6 @@ int main(i32 Argc, char** Argv)
     Camera.Height = 135.0f;
     Camera.Near = 0.1f;
     Camera.Far = 100.0f;
-
     Camera.Projection = glm::ortho(-Camera.Width, Camera.Width, -Camera.Height, Camera.Height, Camera.Near, Camera.Far);
 
     while (IsRunning)
@@ -148,7 +149,7 @@ int main(i32 Argc, char** Argv)
         i32 ModelLocation = glGetUniformLocation(Render->ExampleShader, "Model");
         glUniformMatrix4fv(ModelLocation, 1, GL_FALSE, glm::value_ptr(Model));
 
-        Render->RenderText("as");
+        Render->RenderText("Jorge Sanchez");
 
         Render->EndFrame();
     }

@@ -46,6 +46,7 @@ void Renderer::Init()
     ExampleShader = CompileShader("shaders/text_sdf.glsl");
 
     DefaultFont = LoadFont("assets/Roboto.json", "assets/Roboto.png");
+    // DefaultFont = LoadFont("assets/Arial.json", "assets/Arial.png");
 
     glCreateVertexArrays(1,&VAO);
 
@@ -269,20 +270,26 @@ void Renderer::RenderText(std::string Text)
     // 3- Enviarlo a la gpu usando buffersubdata
     // 4- Dibujarlo!
 
-    glyph Glyph = DefaultFont.Glyphs[Text[1]];
+    // TODO(Jsanchez): loop over the string, and draw the text adding +1.0f on horizontal position to every
 
-    f32 Vertices[] =
+    f32 Advance = 0.0f;
+    for(i32 Index = 0; Index < Text.length(); Index++)
     {
-        // Positions        // Texture Coordinates
-        0.5f, 0.5f, 0.0f, Glyph.Right, Glyph.Top, // top right
-        0.5f, -0.5f, 0.0f, Glyph.Right, Glyph.Bottom, // bottom right
-        -0.5f, -0.5f, 0.0f, Glyph.Left, Glyph.Bottom, // bottom left
-        -0.5f, 0.5f, 0.0f, Glyph.Left, Glyph.Top, // top left
-    };
+        glyph Glyph = DefaultFont.Glyphs[Text[Index]];
+        f32 Vertices[] =
+        {
+            // Positions        // Texture Coordinates
+            Glyph.PlaneRight + Advance, Glyph.PlaneTop, 0.0f, Glyph.Right, Glyph.Top, // top right
+            Glyph.PlaneRight + Advance, Glyph.PlaneBottom, 0.0f, Glyph.Right, Glyph.Bottom, // bottom right
+            Glyph.PlaneLeft + Advance, Glyph.PlaneBottom, 0.0f, Glyph.Left, Glyph.Bottom, // bottom left
+            Glyph.PlaneLeft + Advance, Glyph.PlaneTop, 0.0f, Glyph.Left, Glyph.Top, // top left
+        };
 
-    glNamedBufferSubData(VBO, 0, sizeof(Vertices), Vertices);
+        glNamedBufferSubData(VBO, 0, sizeof(Vertices), Vertices);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        Advance += Glyph.Advance;
+    }
 }
 
 void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
