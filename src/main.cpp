@@ -12,14 +12,17 @@
 
 // TODO LIST:
 //     - Boton mouse izquierda apretado mueve la camara en el plano XY
+//     - Centrar el texto
 //     - Hacer que el texto pequenio se vea mejor
 //     - Batchear los caracteres en solo una draw call
-//     - UBO for Camera
 //     - Hacer un refactor quitando la variable QuadPositionX de globales
+//     - Implementar Outlines https://www.redblobgames.com/blog/2024-08-27-sdf-font-outlines/
+//     - Escribir con texto chico a la izquierda arriba de las ventanas las teclas y que hace cada una
+//     - Agregar kerning
 
 b32 IsRunning = true;
 
-f32 QuadPositionX = -2.0f;
+f32 QuadPositionX = 0.0f;
 
 camera Camera;
 
@@ -82,6 +85,11 @@ void ProcessEvents()
                 printf("Up\n");
             }
 
+            case SDL_EVENT_MOUSE_MOTION:
+            {
+                printf("XRel: %.2f\tYRel: %.2f\n", Event.motion.xrel, Event.motion.yrel);
+            }
+
             default:
             {
                 break;
@@ -116,6 +124,7 @@ int main(i32 Argc, char** Argv)
 
     // Camera Configuration
     // TODO: What type of projection is better for 2D?
+
     Camera.Position = glm::vec3(0.0f, 0.0f, 3.0f);
     Camera.Target = glm::vec3(0.0f, 0.0f, 0.0f);
     Camera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -131,14 +140,13 @@ int main(i32 Argc, char** Argv)
     {
         ProcessEvents();
 
+        f32 XRel;
+        f32 YRel;
+        SDL_MouseButtonFlags Flags = SDL_GetRelativeMouseState(&XRel, &YRel);
+
         Render->BeginFrame();
 
-        // TODO(Jsanchez): Renderer->UpdateCameraUniforms
-        // Upload Camera Settings
-        i32 ViewLocation = glGetUniformLocation(Render->ExampleShader, "View");
-        i32 ProjectionLocation = glGetUniformLocation(Render->ExampleShader, "Projection");
-        glUniformMatrix4fv(ViewLocation, 1, GL_FALSE, glm::value_ptr(Camera.View));
-        glUniformMatrix4fv(ProjectionLocation, 1, GL_FALSE, glm::value_ptr(Camera.Projection));
+        Render->UpdateCamera(&Camera);
 
         // Update and set rendering variables to quad!
         float Scale = 40.0f;
@@ -150,7 +158,7 @@ int main(i32 Argc, char** Argv)
         i32 ModelLocation = glGetUniformLocation(Render->ExampleShader, "Model");
         glUniformMatrix4fv(ModelLocation, 1, GL_FALSE, glm::value_ptr(Model));
 
-        Render->RenderText("Jorge Sanchez");
+        Render->RenderText("abcdefghijklmnñopqrstuvwxyz");
 
         Render->EndFrame();
     }

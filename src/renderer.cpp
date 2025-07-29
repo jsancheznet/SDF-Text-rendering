@@ -1,4 +1,4 @@
-﻿#include "renderer.h"
+﻿
 
 #include <cstdio>
 #include <iostream>
@@ -14,6 +14,9 @@ using json = nlohmann::json;
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "renderer.h"
+#include "camera.h"
+
 Renderer::Renderer(SDL_Window* Window) : Window(Window) {}
 
 void Renderer::Init()
@@ -28,20 +31,19 @@ void Renderer::Init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+#if 0
     { // Print extensions list to stdout
         // Get the number of extensions
         GLint numExtensions;
         glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
 
         // Print all extensions to stdout
-#if 0
         for (GLint i = 0; i < numExtensions; i++) {
             const char* extensionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
             std::cout << "Extension #" << i << ": " << extensionName << std::endl;
         }
-#endif
-
     }
+#endif
 
     ExampleShader = CompileShader("shaders/text_sdf.glsl");
 
@@ -73,6 +75,13 @@ void Renderer::Init()
     glVertexArrayAttribBinding(VAO, 1, 0);
 
     glBindTextureUnit(0, DefaultFont.Texture);
+
+    { // Camera UBO Creation
+        glCreateBuffers(1, &CameraUBO);
+        glNamedBufferStorage(CameraUBO, sizeof(camera_uniform_data), nullptr, GL_DYNAMIC_STORAGE_BIT);
+        u32 BindingPoint = 0;
+        glBindBufferBase(GL_UNIFORM_BUFFER, BindingPoint, CameraUBO);
+    }
 }
 
 void Renderer::BeginFrame()
@@ -282,6 +291,17 @@ void Renderer::RenderText(std::string Text)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         Advance += Glyph.Advance;
     }
+}
+
+void Renderer::UpdateCamera(camera *Camera)
+{
+    camera_uniform_data UploadData = {};
+
+    UploadData.View = Camera->View;
+    UploadData.Projection = Camera->Projection;
+
+    u32 Offset = 0;
+    glNamedBufferSubData(CameraUBO, Offset, sizeof(camera_uniform_data), &UploadData);
 }
 
 void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)

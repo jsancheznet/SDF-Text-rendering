@@ -4,7 +4,15 @@
 #include <glad/glad.h>
 
 #include "SDL3/SDL_video.h"
+
 #include "bitmap_font.h"
+#include "camera.h"
+
+struct alignas(16) camera_uniform_data
+{
+    glm::mat4 View;
+    glm::mat4 Projection;
+};
 
 struct Renderer
 {
@@ -14,6 +22,7 @@ struct Renderer
     u32 VAO = 0;
     u32 VBO = 0;
     u32 EBO = 0;
+    u32 CameraUBO;
 
     u32 ExampleShader = 0;
 
@@ -22,6 +31,7 @@ struct Renderer
     void EndFrame();
     u32 CompileShader(const char* Filename);
     u32 CreateTexture(const char* Filepath);
+    void UpdateCamera(camera *Camera);
 
     // Font And Text Drawing
     bitmap_font DefaultFont;
