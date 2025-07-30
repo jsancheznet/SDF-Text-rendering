@@ -11,9 +11,9 @@
 #include "typedefs.h"
 
 // TODO LIST:
-//     - Boton mouse izquierda apretado mueve la camara en el plano XY
+//     - Ir a parte donde se hace el pan, y completar las cosas que faltan
 //     - Centrar el texto
-//     - Hacer que el texto pequenio se vea mejor
+//     - Hacer que el texto pequenio se vea mejor,
 //     - Batchear los caracteres en solo una draw call
 //     - Hacer un refactor quitando la variable QuadPositionX de globales
 //     - Implementar Outlines https://www.redblobgames.com/blog/2024-08-27-sdf-font-outlines/
@@ -76,20 +76,8 @@ void ProcessEvents()
             }
 
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            {
-                printf("Down\n");
-            }
-
             case SDL_EVENT_MOUSE_BUTTON_UP:
-            {
-                printf("Up\n");
-            }
-
             case SDL_EVENT_MOUSE_MOTION:
-            {
-                printf("XRel: %.2f\tYRel: %.2f\n", Event.motion.xrel, Event.motion.yrel);
-            }
-
             default:
             {
                 break;
@@ -108,14 +96,12 @@ int main(i32 Argc, char** Argv)
     SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    // TODO(Jsanchez): Aliasing, we might be doing pixel art, we may not want aliasing
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 
     // TODO(Jsanchez): Turn debug off on release
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
-    // TODO: Platform->CreateWindow("Untitled", 1366, 768);
     SDL_Window* Window = SDL_CreateWindow("SDF Text Rendering", 1366, 768, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     SDL_GLContext GLContext = SDL_GL_CreateContext(Window);
 
@@ -123,8 +109,6 @@ int main(i32 Argc, char** Argv)
     Render->Init();
 
     // Camera Configuration
-    // TODO: What type of projection is better for 2D?
-
     Camera.Position = glm::vec3(0.0f, 0.0f, 3.0f);
     Camera.Target = glm::vec3(0.0f, 0.0f, 0.0f);
     Camera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -142,7 +126,29 @@ int main(i32 Argc, char** Argv)
 
         f32 XRel;
         f32 YRel;
-        SDL_MouseButtonFlags Flags = SDL_GetRelativeMouseState(&XRel, &YRel);
+        SDL_MouseButtonFlags MouseBtnFlags = SDL_GetRelativeMouseState(&XRel, &YRel);
+
+        if(MouseBtnFlags & SDL_BUTTON_RMASK)
+        {
+            // TODO(Jsanchez): Control panning speed according to zoom
+            // TODO(Jsanchez): Create a mouse file and implement IsPressed(RIGHT_MOUSE_BUTTON);
+            // if(IsPressed(RIGHT_MOUSE_BUTTON))
+            // {
+            // }
+            Camera.Position.x -= XRel * 0.2f;
+            Camera.Target.x -= XRel * 0.2f;
+            Camera.Position.y += YRel * 0.2f;
+            Camera.Target.y += YRel * 0.2f;
+            Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
+
+            // TODO(Jsanchez): This is leaking memory, create the cursors at init and swap them here, maybe we could
+            // swap them at the event handler function, Pressed, Released
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER));
+        }
+        else
+        {
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT));
+        }
 
         Render->BeginFrame();
 
