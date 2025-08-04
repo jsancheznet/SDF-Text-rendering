@@ -8,10 +8,11 @@
 
 #include "renderer.h"
 #include "camera.h"
+#include "mouse.h"
 #include "typedefs.h"
 
 // TODO LIST:
-//     - Ir a parte donde se hace el pan, y completar las cosas que faltan
+//     - Ir a parte donde se hace el pannning de camara, Hacer una lista de papel de las cosas que voy a implementar
 //     - Centrar el texto
 //     - Hacer que el texto pequenio se vea mejor,
 //     - Batchear los caracteres en solo una draw call
@@ -24,7 +25,9 @@ b32 IsRunning = true;
 
 f32 QuadPositionX = 0.0f;
 
-camera Camera;
+renderer Renderer = {};
+camera Camera = {};
+mouse Mouse = {};
 
 void ProcessEvents()
 {
@@ -105,8 +108,8 @@ int main(i32 Argc, char** Argv)
     SDL_Window* Window = SDL_CreateWindow("SDF Text Rendering", 1366, 768, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     SDL_GLContext GLContext = SDL_GL_CreateContext(Window);
 
-    Renderer* Render = new Renderer(Window);
-    Render->Init();
+    Renderer.Init(Window);
+    Mouse.Init();
 
     // Camera Configuration
     Camera.Position = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -124,35 +127,28 @@ int main(i32 Argc, char** Argv)
     {
         ProcessEvents();
 
-        f32 XRel;
-        f32 YRel;
-        SDL_MouseButtonFlags MouseBtnFlags = SDL_GetRelativeMouseState(&XRel, &YRel);
+        Mouse.UpdateState();
 
-        if(MouseBtnFlags & SDL_BUTTON_RMASK)
+        if(Mouse.IsPressed(RIGHT_BUTTON))
         {
-            // TODO(Jsanchez): Control panning speed according to zoom
-            // TODO(Jsanchez): Create a mouse file and implement IsPressed(RIGHT_MOUSE_BUTTON);
-            // if(IsPressed(RIGHT_MOUSE_BUTTON))
-            // {
-            // }
-            Camera.Position.x -= XRel * 0.2f;
-            Camera.Target.x -= XRel * 0.2f;
-            Camera.Position.y += YRel * 0.2f;
-            Camera.Target.y += YRel * 0.2f;
+            f32 DeltaX = Mouse.RelativePosX * 0.2f;
+            f32 DeltaY = Mouse.RelativePosY * 0.2f;
+            Camera.Position.x -= DeltaX;
+            Camera.Target.x -= DeltaX;
+            Camera.Position.y += DeltaY;
+            Camera.Target.y += DeltaY;
             Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
 
-            // TODO(Jsanchez): This is leaking memory, create the cursors at init and swap them here, maybe we could
-            // swap them at the event handler function, Pressed, Released
-            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER));
+            Mouse.SetCursor(Mouse.GrabbingCursor);
         }
         else
         {
-            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT));
+            Mouse.SetCursor(Mouse.DefaultCursor);
         }
 
-        Render->BeginFrame();
+        Renderer.BeginFrame();
 
-        Render->UpdateCamera(&Camera);
+        Renderer.UpdateCamera(&Camera);
 
         // Update and set rendering variables to quad!
         float Scale = 40.0f;
@@ -161,12 +157,12 @@ int main(i32 Argc, char** Argv)
         glm::mat4 Model = glm::mat4(1.0f);
         Model = glm::scale(Model, QuadScale);
         Model = glm::translate(Model, QuadPosition);
-        i32 ModelLocation = glGetUniformLocation(Render->ExampleShader, "Model");
+        i32 ModelLocation = glGetUniformLocation(Renderer.ExampleShader, "Model");
         glUniformMatrix4fv(ModelLocation, 1, GL_FALSE, glm::value_ptr(Model));
 
-        Render->RenderText("abcdefghijklmnñopqrstuvwxyz");
+        Renderer.RenderText("abcdefghijklmnñopqrstuvwxyz");
 
-        Render->EndFrame();
+        Renderer.EndFrame();
     }
 
     SDL_Quit();

@@ -17,10 +17,10 @@ using json = nlohmann::json;
 #include "renderer.h"
 #include "camera.h"
 
-Renderer::Renderer(SDL_Window* Window) : Window(Window) {}
-
-void Renderer::Init()
+void renderer::Init(SDL_Window* Window)
 {
+    Window = Window;
+
     gladLoadGL();
 
     { // Enable OpenGL Debug Mode
@@ -84,7 +84,7 @@ void Renderer::Init()
     }
 }
 
-void Renderer::BeginFrame()
+void renderer::BeginFrame()
 {
     glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -94,12 +94,12 @@ void Renderer::BeginFrame()
     glUseProgram(ExampleShader);
 }
 
-void Renderer::EndFrame()
+void renderer::EndFrame()
 {
     SDL_GL_SwapWindow(Window);
 }
 
-u32 Renderer::CompileShader(const char* Filename)
+u32 renderer::CompileShader(const char* Filename)
 {
     Assert(Filename);
 
@@ -159,7 +159,7 @@ u32 Renderer::CompileShader(const char* Filename)
     return CompiledShader;
 }
 
-u32 Renderer::CreateTexture(const char* Filepath)
+u32 renderer::CreateTexture(const char* Filepath)
 {
     u32 Handle;
 
@@ -185,7 +185,7 @@ u32 Renderer::CreateTexture(const char* Filepath)
     return Handle;
 }
 
-bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
+bitmap_font renderer::LoadFont(std::string Json, std::string Image)
 {
     bitmap_font Result = {};
 
@@ -270,7 +270,7 @@ bitmap_font Renderer::LoadFont(std::string Json, std::string Image)
     return Result;
 }
 
-void Renderer::RenderText(std::string Text)
+void renderer::RenderText(std::string Text)
 {
 
     f32 Advance = 0.0f;
@@ -293,7 +293,7 @@ void Renderer::RenderText(std::string Text)
     }
 }
 
-void Renderer::UpdateCamera(camera *Camera)
+void renderer::UpdateCamera(camera *Camera)
 {
     camera_uniform_data UploadData = {};
 
@@ -304,7 +304,7 @@ void Renderer::UpdateCamera(camera *Camera)
     glNamedBufferSubData(CameraUBO, Offset, sizeof(camera_uniform_data), &UploadData);
 }
 
-void Renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
+void renderer::OpenGLDebugMessageCallback(GLenum Source, GLenum Type, GLuint Id, GLenum Severity, GLsizei Length, GLchar const* Message, void const* UserParam)
 {
     using namespace std;
 

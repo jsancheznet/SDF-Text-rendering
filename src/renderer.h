@@ -14,11 +14,8 @@ struct alignas(16) camera_uniform_data
     glm::mat4 Projection;
 };
 
-struct Renderer
+struct renderer
 {
-
-    Renderer(SDL_Window *Window);
-
     u32 VAO = 0;
     u32 VBO = 0;
     u32 EBO = 0;
@@ -26,7 +23,7 @@ struct Renderer
 
     u32 ExampleShader = 0;
 
-    void Init();
+    void Init(SDL_Window *Window);
     void BeginFrame();
     void EndFrame();
     u32 CompileShader(const char* Filename);
