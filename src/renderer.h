@@ -23,7 +23,7 @@ struct renderer
 
     u32 ExampleShader = 0;
 
-    void Init(SDL_Window *Window);
+    void Init(SDL_Window *WindowIn);
     void BeginFrame();
     void EndFrame();
     u32 CompileShader(const char* Filename);

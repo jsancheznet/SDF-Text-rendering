@@ -17,9 +17,9 @@ using json = nlohmann::json;
 #include "renderer.h"
 #include "camera.h"
 
-void renderer::Init(SDL_Window* Window)
+void renderer::Init(SDL_Window* WindowIn)
 {
-    Window = Window;
+    Window = WindowIn;
 
     gladLoadGL();
 
@@ -31,7 +31,7 @@ void renderer::Init(SDL_Window* Window)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-#if 0
+#if 1
     { // Print extensions list to stdout
         // Get the number of extensions
         GLint numExtensions;
