@@ -31,7 +31,7 @@ void renderer::Init(SDL_Window* WindowIn)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-#if 1
+#if 0
     { // Print extensions list to stdout
         // Get the number of extensions
         GLint numExtensions;
