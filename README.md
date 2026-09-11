@@ -1,6 +1,8 @@
 # SDF Text Rendering
 
-An experiment with **Signed Distance Field (SDF) text rendering**
+A small C++ / OpenGL experiment exploring Signed Distance Field (SDF) text rendering.
+
+The project explores rendering text from a distance-field texture, allowing glyphs to remain sharp at different sizes and scales.
 
 ## Build
 Run:
