@@ -1,5 +1,9 @@
 # SDF Text Rendering
 
+![SDF text staying sharp while zooming from small to very large sizes](./screenshots/sdf_text.gif)
+
+▶ [Watch in full quality on YouTube](https://youtu.be/JjxZG1VvaMQ)
+
 A small C++ / OpenGL experiment exploring Signed Distance Field (SDF) text rendering.
 
 The project explores rendering text from a distance-field texture, allowing glyphs to remain sharp at different sizes and scales.

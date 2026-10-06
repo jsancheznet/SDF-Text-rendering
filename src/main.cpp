@@ -160,7 +160,7 @@ int main(i32 Argc, char** Argv)
         i32 ModelLocation = glGetUniformLocation(Renderer.ExampleShader, "Model");
         glUniformMatrix4fv(ModelLocation, 1, GL_FALSE, glm::value_ptr(Model));
 
-        Renderer.RenderText("abcdefghijklmnñopqrstuvwxyz");
+        Renderer.RenderText("The quick brown fox jumps over the lazy dog");
 
         Renderer.EndFrame();
     }
